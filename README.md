@@ -1,97 +1,144 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🚖 RapidRide — User Application
 
-# Getting Started
+A high-performance, real-time ride hailing mobile application built with **React Native (0.87)**, modern vector UI, interactive **Leaflet/Google Maps**, multi-profile shortest path routing, and live driver tracking.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## ✨ Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- 🗺️ **High-Fidelity Interactive Map**:
+  - Google Maps raster tiles with standard and satellite layer toggling.
+  - Smooth GPS auto-detection and custom pulsing location pins.
+  - Interactive map-click dropoff selection and full route viewport fitting.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- 🛣️ **Smart Shortest Path Road Routing**:
+  - Multi-profile routing supporting **Bike**, **Foot**, **Car**, and **Alley/Gali Pathways** (including residential and private corridors).
+  - Automatically queries multiple endpoints and selects the true shortest distance path.
+  - Multi-route preview with interactive touch selection for alternative routes.
 
-```sh
-# Using npm
+- 🛵 **Dynamic Vehicle Selection & Visibility**:
+  - Live availability for **Bike**, **Auto**, and **Cab**.
+  - Strict step-based map visibility: zero vehicles shown on the initial location screen; filtered vehicle markers shown on the vehicle selection screen.
+  - Distance and dynamic fare calculation based on the shortest road path.
+
+- 📍 **Live Ride Tracking & Status Lifecycle**:
+  - **Phase 1 (`ACCEPTED`)**: Displays captain vector marker and dynamic route to User Pickup (Point A).
+  - **Phase 2 (`IN_PROGRESS`)**: Switches to destination tracking (Point B) upon OTP verification.
+  - Driver chat modal, SOS safety modal, and fare breakdown.
+
+- ⚡ **Resilient Backend & Offline Caching**:
+  - Cloud server fallback (`https://rapidrideserver.onrender.com/api`) with auto-reconnection.
+  - Persistent user session & last known location caching via `@react-native-async-storage/async-storage`.
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Version / Tool |
+|---|---|
+| **Framework** | [React Native](https://reactnative.dev) `0.87.1` |
+| **Language** | JavaScript (ESNext) + JSX |
+| **Engine** | Hermes Engine & New Architecture |
+| **Map & GIS** | `react-native-webview` + Leaflet 1.9.4 + OSRM & OpenStreetMap.de |
+| **Vector Icons & Graphics** | `react-native-svg` |
+| **Storage** | `@react-native-async-storage/async-storage` |
+| **Backend API** | Node.js + Express + MongoDB (Hosted on Render) |
+
+---
+
+## 📁 Project Structure
+
+```
+UserApp/
+├── android/                   # Native Android project files
+│   ├── app/
+│   │   ├── src/main/assets/   # Bundled JS & vector assets
+│   │   └── build.gradle       # App-level build config
+│   └── build.gradle           # Top-level Gradle config
+├── ios/                       # Native iOS project files
+├── src/
+│   ├── components/
+│   │   ├── user/
+│   │   │   ├── auth/          # Login, Register, StartupVideoScreen
+│   │   │   ├── booking/       # LocationStep, VehicleStep, ActiveRideCard, Modals
+│   │   │   ├── home/          # UserHome (Main container & state management)
+│   │   │   └── map/           # MapView (Leaflet GIS WebView engine)
+│   │   ├── Icon.jsx           # Material vector icon wrapper
+│   │   └── Navigation.jsx     # Navigation tabs & transitions
+│   ├── hooks/                 # Custom React hooks (useNavigation)
+│   ├── services/
+│   │   └── api.js             # Centralized API service & candidate URLs
+│   └── utils/
+│       ├── distance.js        # Haversine distance calculator
+│       └── storage.js         # Async storage helper
+├── App.jsx                    # Root application component
+├── index.js                   # Application entry point
+├── package.json
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js**: `>= 22.11.0`
+- **JDK**: Java 17 (Amazon Corretto or OpenJDK)
+- **Android SDK & Platform Tools**: Android Studio with SDK build-tools 35+
+
+---
+
+### 1. Installation
+Clone the repository and install dependencies:
+```bash
+npm install
+```
+
+---
+
+### 2. Running in Development Mode
+
+#### **Start Metro Bundler:**
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+#### **Run on Android Device / Emulator:**
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### 3. Building a Production Release APK
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+To create an optimized, standalone Android release APK:
 
-```sh
-bundle install
+#### **Step 1: Bundle React Native JS Assets**
+```bash
+npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
 ```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
+#### **Step 2: Compile with Gradle**
+```bash
+cd android
+./gradlew assembleRelease
 ```
+*(On Windows Command Prompt: `gradlew.bat assembleRelease`)*
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+#### **Output Location:**
+The generated APK will be available at:
+`android/app/build/outputs/apk/release/app-release.apk`
 
-```sh
-# Using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
-```
+## 🌐 API Configuration
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+API endpoints are configured in [`src/services/api.js`](file:///c:/Users/Abhinav%20Pandey/Desktop/User%20App/UserApp/src/services/api.js):
+- **Primary Production Server**: `https://rapidrideserver.onrender.com/api`
+- **Automatic Fallback**: Local IP and loopback URLs
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+---
 
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 📄 License
+Private & Confidential — Built for RapidRide.
